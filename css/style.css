@@ -133,8 +133,8 @@ figure img{width:100%;height:auto}
 .closing .script{color:var(--gold)}
 
 /* Page-like sections: each section fills one screen */
-html{scroll-snap-type:y proximity}
-.hero,.sec,.closing{min-height:100svh;scroll-snap-align:start}
+
+.hero,.sec,.closing{min-height:100svh}
 .sec{display:flex;flex-direction:column;justify-content:center}
 .date{min-height:100svh}
 .hero{justify-content:center}
@@ -143,7 +143,7 @@ html{scroll-snap-type:y proximity}
 /* Opening video is portrait: fill phones, letterbox on landscape screens */
 .intro video{object-fit:cover}
 @media (orientation:landscape){.intro video{object-fit:contain}}
-@media (prefers-reduced-motion:reduce){html{scroll-snap-type:none}}
+
 
 /* Ceremony */
 .ceremony{max-width:640px;margin:0 auto;padding:clamp(2.2rem,8vw,4rem) clamp(1.25rem,6vw,3rem);color:var(--text)}
@@ -169,3 +169,10 @@ html{scroll-snap-type:y proximity}
 .intro.playing .open{opacity:0;pointer-events:none;visibility:hidden}
 .intro:not(.playing) .skip{display:none}
 .ceremony .bigdate{font-size:clamp(1.8rem,8vw,3.2rem);white-space:nowrap}
+
+/* Smooth scrolling: native scroll, light animations only */
+html{scroll-behavior:smooth;overscroll-behavior-y:none}
+[data-reveal],.stagger>*{will-change:opacity,transform}
+[data-reveal].in,.stagger.in>*{will-change:auto}
+.hero,.sec,.closing{contain:layout paint}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
