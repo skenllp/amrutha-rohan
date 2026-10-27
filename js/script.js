@@ -34,7 +34,8 @@
     });
   }
   function armStall() { clearTimeout(stallTimer); stallTimer = setTimeout(endIntro, STALL_TIMEOUT); }
-  function playing() { clearTimeout(startTimer); clearTimeout(stallTimer); }
+  function live() { intro.classList.add('live'); }
+  function playing() { clearTimeout(startTimer); clearTimeout(stallTimer); live(); }
 
   if (reduce || !video) {
     endIntro();
@@ -56,6 +57,7 @@
       intro.classList.add('playing');
       startMusic();
       startTimer = setTimeout(endIntro, START_TIMEOUT);
+      if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(live);
       var p = video.play();
       if (p && p.catch) p.catch(endIntro);
     });
