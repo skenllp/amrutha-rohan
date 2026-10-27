@@ -168,3 +168,4 @@ html{scroll-snap-type:y proximity}
 .open:hover,.open:focus-visible{background:rgba(116,63,59,.75)}
 .intro.playing .open{opacity:0;pointer-events:none;visibility:hidden}
 .intro:not(.playing) .skip{display:none}
+.ceremony .bigdate{font-size:clamp(1.8rem,8vw,3.2rem);white-space:nowrap}
