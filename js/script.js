@@ -4,10 +4,15 @@
   /* ---------- Editable configuration ----------
      Leave a value empty ('') and it is hidden on the page. */
   var CONFIG = {
+    // RSVP: set a WhatsApp number (country code, digits only, e.g. '919XXXXXXXXX') and/or an email.
+    // With neither set, the RSVP section stays hidden.
+    rsvp: { sheet: '', whatsapp: '', email: '' }, // sheet = Google Apps Script web app URL (see google-apps-script/Code.gs),
     ceremonyStart: '12:10', // 24h, Asia/Kolkata (IST, UTC+05:30) on 20 Dec 2026
     music: 'assets/audio/wedding-song.mp3' // Empty = no music, button hidden.
   };
 
+  var NAMES = document.body.getAttribute('data-names') || 'Amrutha & Rohan';
+  var SIDE = document.body.getAttribute('data-side') || 'bride';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -88,6 +93,7 @@
     var iv = setInterval(tick, 1000); tick(); cdEl.hidden = false;
   }
 
+
   /* ---------- Gallery + lightbox ---------- */
   var photos = [
     { k: 'collage2', w: 2061, h: 2576, alt: 'Four-panel film strip of the couple running through a sunlit garden', c: 'full' },
@@ -138,6 +144,58 @@
     var dx = e.changedTouches[0].clientX - sx;
     if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
   }, { passive: true });
+
+  /* ---------- RSVP (opens WhatsApp / email with a ready-made message) ---------- */
+  var rsvpSec = $('#rsvp'), R = CONFIG.rsvp || {};
+  R.sheet = document.body.getAttribute('data-sheet') || R.sheet; // each page can post to its own sheet
+  if (rsvpSec && (R.sheet || R.whatsapp || R.email)) {
+    rsvpSec.hidden = false;
+    var form = $('#rsvpForm'), err = $('#rsvpErr'), mail = $('#rsvpMail');
+    function text() {
+      var f = form.elements, yes = f.attend.value === 'yes', n = f.name.value.trim();
+      var t = 'RSVP \u2013 ' + NAMES + '\u2019s Wedding (20 December 2026)\nName: ' + n + '\n' +
+        (yes ? 'Attending: Yes, joyfully accept\nGuests: ' + f.guests.value : 'Attending: Regretfully unable to attend');
+      if (f.msg.value.trim()) t += '\nMessage: ' + f.msg.value.trim();
+      return t;
+    }
+    $$('input[name=attend]', form).forEach(function (r) {
+      r.addEventListener('change', function () { form.toggleAttribute('data-no', form.elements.attend.value === 'no'); });
+    });
+    if (R.email) {
+      mail.hidden = false;
+      mail.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!form.elements.name.value.trim()) { err.hidden = false; return; }
+        location.href = 'mailto:' + R.email + '?subject=' + encodeURIComponent('RSVP \u2013 ' + NAMES) + '&body=' + encodeURIComponent(text());
+      });
+    }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var f = form.elements;
+      if (!f.name.value.trim()) { err.hidden = false; f.name.focus(); return; }
+      err.hidden = true;
+      if (f.website && f.website.value) return; // spam trap
+      var yes = f.attend.value === 'yes';
+      if (R.sheet) {
+        var btn = $('#rsvpSend'), fail = $('#rsvpFail');
+        btn.disabled = true; btn.textContent = 'Sending\u2026'; fail.hidden = true;
+        var done = function () { form.classList.add('sent'); $('#rsvpThanks').hidden = false; };
+        var failed = function () { fail.hidden = false; btn.disabled = false; btn.textContent = 'Send RSVP'; };
+        fetch(R.sheet, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ name: f.name.value.trim(), attending: yes ? 'Yes' : 'No', guests: yes ? f.guests.value : 0, message: f.msg.value.trim(), side: SIDE })
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          if (j && j.ok === false) failed(); else done();
+        }).catch(function () {
+          // No readable reply (browser CORS quirk): the request was still sent, so only fail when offline.
+          if (navigator.onLine === false) failed(); else done();
+        });
+        return;
+      }
+      if (R.whatsapp) window.open('https://wa.me/' + R.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(text()), '_blank', 'noopener');
+      else if (R.email) mail.click();
+    });
+  }
 
   /* ---------- Music (starts from the beginning when the invitation is opened) ---------- */
   var mb = $('#musicBtn'), audio = null;

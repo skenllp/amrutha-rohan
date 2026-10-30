@@ -191,3 +191,32 @@ html{scroll-behavior:smooth;overscroll-behavior-y:none}
 .closing .eyebrow{color:var(--gold)}
 .closing .rule{margin:1.4rem auto;transform-origin:center}
 .closing{padding-bottom:clamp(5.5rem,16vw,8rem)}
+
+/* RSVP */
+.rsvp-form{text-align:left;margin-top:2rem}
+.fld{display:block;margin-bottom:1.4rem}
+.fld span{display:block;font:500 .7rem var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.4rem}
+.fld input,.fld select,.fld textarea{width:100%;min-height:48px;padding:.6rem .1rem;font:400 16px/1.5 var(--sans);color:var(--text);background:transparent;border:0;border-bottom:1px solid var(--gold);border-radius:0;outline:0;-webkit-appearance:none;appearance:none}
+.fld textarea{min-height:84px;resize:vertical}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-bottom-color:var(--burgundy)}
+.choice{border:0;margin:0 0 1.4rem;padding:0;display:grid;gap:.6rem}
+.choice label{display:block}
+.choice input{position:absolute;opacity:0}
+.choice span{display:flex;align-items:center;justify-content:center;min-height:48px;border:1px solid var(--gold);font:500 .78rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--deep);cursor:pointer;transition:background .3s,color .3s}
+.choice input:checked+span{background:var(--deep);color:var(--cream);border-color:var(--deep)}
+.choice input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+@media(min-width:600px){.choice{grid-template-columns:1fr 1fr}}
+.rsvp-form .btn{width:100%;border:0;cursor:pointer;margin-top:.4rem}
+.alt{display:block;text-align:center;margin-top:1.1rem;font-size:.85rem;color:var(--burgundy)}
+.err{color:var(--burgundy);font-size:.9rem;margin:0 0 1rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#rsvpForm[data-no] #guestsWrap{display:none}
+
+.sec[hidden]{display:none}
+.rsvp .rule{margin-left:auto;margin-right:auto;transform-origin:center}
+
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.thanks{text-align:center;font:italic 400 1.3rem/1.5 var(--serif);color:var(--deep);margin:1rem 0 0}
+.thanks[hidden],.err[hidden]{display:none}
+.rsvp-form.sent>*:not(.thanks){display:none}
+.rsvp-form button:disabled{opacity:.6;cursor:wait}
